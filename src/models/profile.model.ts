@@ -60,7 +60,7 @@ export default class Profile extends Model {
 
       }
 
-      throw new Error('Profile could not be deleted.');
+      throw new Error('Profile does not exists.');
 
     } catch (error: unknown) {
       console.error(error);
