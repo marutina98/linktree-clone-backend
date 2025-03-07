@@ -1,10 +1,9 @@
 import IPool from '../interfaces/pool.interface';
-
-import Model from '../database/model';
-
 import IProfile from '../interfaces/profile.interface';
 
-export default class Profile extends Model {
+const Model = require('./../database/model');
+
+class Profile extends Model {
 
   constructor(pool: IPool) {
     super(pool);
@@ -57,7 +56,9 @@ export default class Profile extends Model {
       const profileExists = await this.checkIfProfileExists(userId);
 
       if (profileExists) {
-
+        const query = 'DELETE FROM profiles WHERE user_id = ?;';
+        const [result] = await this.pool.query(query, [userId]);
+        return true;
       }
 
       throw new Error('Profile does not exists.');
@@ -73,9 +74,11 @@ export default class Profile extends Model {
     const query = 'SELECT EXISTS (SELECT * FROM profiles WHERE user_id = ?) AS profileExists;';
     const [result] = await this.pool.query(query, [userId]);
 
-    if (result.length > 0) return Boolean(result[0].userExists);
+    if (result.length > 0) return Boolean(result[0].profileExists);
     throw new Error('Could not verify if profile exists or not.');
 
   }
 
 }
+
+module.exports = Profile;

@@ -2,14 +2,14 @@ import IPool from '../interfaces/pool.interface';
 import IUser from '../interfaces/user.interface';
 import ICreateUserRequest from '../interfaces/create-user-request.interface';
 
-import Model from '../database/model';
-import Profile from './profile.model';
+const Model = require('./../database/model');
+const Profile = require('./profile.model');
 
 const bcrypt = require('bcrypt');
 
 class User extends Model {
 
-  private profile: Profile;
+  private profile: typeof Profile;
 
   constructor(pool: IPool) {
     super(pool);
@@ -92,9 +92,36 @@ class User extends Model {
 
   // @db: update user
 
-  public async updateUser(userId: number) {
+  public async updateUser(id: number, data: ICreateUserRequest) {
 
-    // Check that user exists
+    // If User exists update user and profile
+
+    const userExists = await this.checkIfUserExists(id);
+
+    if (userExists) {
+
+      // Update Profile
+
+      await this.profile.updateProfile(data);
+
+      // Update User
+      // Rehash the password
+
+      const password = this.hashPassword(data.password);
+
+      const query = 'UPDATE users SET password = ?, email = ? WHERE id = ?;';
+      const values = [password, data.email, id];
+
+      const [result] = await this.pool.query(query, values);
+
+      // Get user with profile and return it
+
+      const user = this.getById(id, true);
+      return user;
+
+    }
+
+    throw new Error('User does not exists.');
 
   }
 
@@ -114,7 +141,7 @@ class User extends Model {
 
         // Delete Profile
 
-        // @todo: Profile Model
+        await this.profile.deleteProfile(id);
 
         // Delete User
 
@@ -124,6 +151,8 @@ class User extends Model {
         return result;
 
       }
+
+      throw new Error('User does not exist');
 
     } catch (error: unknown) {
       console.error(error);
