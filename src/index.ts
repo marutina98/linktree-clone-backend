@@ -20,4 +20,8 @@ const user = new User(pool);
 
   // await migrate(pool);
 
+  const deleteUser = await user.deleteUser(4);
+
+  console.log(deleteUser);
+
 })();

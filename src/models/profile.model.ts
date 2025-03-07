@@ -2,7 +2,7 @@ import IPool from '../interfaces/pool.interface';
 
 import Model from '../database/model';
 
-import ICreateProfileRequest from '../interfaces/create-profile-request.interface';
+import IProfile from '../interfaces/profile.interface';
 
 export default class Profile extends Model {
 
@@ -28,7 +28,7 @@ export default class Profile extends Model {
     return result;
   }
 
-  public async createProfile(userId: number, data: ICreateProfileRequest) {
+  public async createProfile(userId: number, data: IProfile) {
     
     const query = 'INSERT INTO profiles (user_id, name) VALUES (?, ?);';
     const values = [userId, data.name];
@@ -44,7 +44,7 @@ export default class Profile extends Model {
 
   }
 
-  public async updateProfile(userId: number, data: ICreateProfileRequest) {
+  public async updateProfile(userId: number, data: IProfile) {
 
     // @todo: update profile    
 
@@ -52,7 +52,29 @@ export default class Profile extends Model {
 
   public async deleteProfile(userId: number) {
 
-    // @todo: delete profile
+    try {
+
+      const profileExists = await this.checkIfProfileExists(userId);
+
+      if (profileExists) {
+
+      }
+
+      throw new Error('Profile could not be deleted.');
+
+    } catch (error: unknown) {
+      console.error(error);
+    }
+
+  }
+
+  public async checkIfProfileExists(userId: number) {
+
+    const query = 'SELECT EXISTS (SELECT * FROM profiles WHERE user_id = ?) AS profileExists;';
+    const [result] = await this.pool.query(query, [userId]);
+
+    if (result.length > 0) return Boolean(result[0].userExists);
+    throw new Error('Could not verify if profile exists or not.');
 
   }
 

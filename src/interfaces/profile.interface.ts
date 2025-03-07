@@ -1,4 +1,4 @@
-export default interface ICreateProfileRequest {
+export default interface IProfile {
   name: string,
   bio: string,
   picture?: string,

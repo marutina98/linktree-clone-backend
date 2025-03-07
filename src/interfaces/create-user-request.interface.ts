@@ -1,4 +1,4 @@
-import ICreateProfileRequest from './create-profile-request.interface';
+import ICreateProfileRequest from './profile.interface';
 
 export default interface ICreateUserRequest extends ICreateProfileRequest {
   email: string,

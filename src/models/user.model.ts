@@ -1,4 +1,5 @@
 import IPool from '../interfaces/pool.interface';
+import IUser from '../interfaces/user.interface';
 import ICreateUserRequest from '../interfaces/create-user-request.interface';
 
 import Model from '../database/model';
@@ -16,14 +17,22 @@ class User extends Model {
   }
 
   // @db: get all
+  // add profile if wanted
 
-  public async getAll() {
+  public async getAll(getProfile: boolean = false) {
     
     try {
 
       const query = 'SELECT * FROM users;';
-      const [rows] = await this.pool.query(query);
-      return rows;
+      const [users] = await this.pool.query(query);
+
+      if (getProfile) {
+        for (let index in users) {
+          return await this.addProfileToUser(users[index]);
+        }
+      }
+
+      return users;
 
     } catch (error: unknown) {
       console.error(error);
@@ -32,13 +41,18 @@ class User extends Model {
   }
 
   // @db: get one by id
+  // add profile if wanted
 
-  public async getById(id: number) {
+  public async getById(id: number, getProfile: boolean = false) {
     
     try {
       const query = 'SELECT * FROM users WHERE id = ?;';
-      const [rows] = await this.pool.query(query, [id]);
-      return rows;
+      const [user] = (await this.pool.query(query, [id]))[0];
+
+      if (getProfile) return this.addProfileToUser(user);
+
+      return user;
+
     } catch (error: unknown) {
       console.error(error);
     }
@@ -68,10 +82,7 @@ class User extends Model {
 
       const profile = await this.profile.createProfile(user.id, data);
 
-      return {
-        user,
-        profile
-      }
+      return { user, profile }
 
     } catch (error: unknown) {
       console.log(error);
@@ -81,7 +92,9 @@ class User extends Model {
 
   // @db: update user
 
-  public async updateUser() {
+  public async updateUser(userId: number) {
+
+    // Check that user exists
 
   }
 
@@ -89,13 +102,48 @@ class User extends Model {
 
   public async deleteUser(id: number) {
 
-    // Delete All Links
-    // Delete Profile
-    // Delete User
+    try {
+
+      const userExists = await this.checkIfUserExists(id);
+
+      if (userExists) {
+
+        // Delete Links
+
+        // @todo: Link Model
+
+        // Delete Profile
+
+        // @todo: Profile Model
+
+        // Delete User
+
+        const query = 'DELETE FROM users WHERE id = ?;';
+        const [result] = await this.pool.query(query, [id]);
+
+        return result;
+
+      }
+
+    } catch (error: unknown) {
+      console.error(error);
+    }
 
   }
 
-  // @ encrypt and compare password
+  // @db: check if the user exists
+
+  public async checkIfUserExists(userId: number) {
+
+    const query = 'SELECT EXISTS (SELECT * FROM users WHERE id = ?) AS userExists;';
+    const [result] = await this.pool.query(query, [userId]);
+
+    if (result.length > 0) return Boolean(result[0].userExists);
+    throw new Error('Could not verify if user exists or not.');
+
+  }
+
+  // encrypt and compare password
 
   public async hashPassword(password: string, saltRounds: number = 10) {
     return bcrypt.hash(password, saltRounds);
@@ -104,6 +152,14 @@ class User extends Model {
   public async comparePassword(userId: number, password: string) {
     const user = await this.getById(userId);
     return bcrypt.compare(password, user.password);
+  }
+
+  // add profile to user
+
+  public async addProfileToUser(user: IUser) {
+    const profile = await this.profile.getByUserId(user.id);
+    user.profile = profile[0];
+    return user;
   }
 
 }
