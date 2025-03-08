@@ -43,7 +43,11 @@ class Profile extends Model {
 
   public async updateProfile(userId: number, data: IProfile) {
 
-    // @todo: update profile    
+    try {
+
+    } catch (error: unknown) {
+      console.error(error);
+    }
 
   }
 

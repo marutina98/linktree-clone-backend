@@ -94,34 +94,40 @@ class User extends Model {
 
   public async updateUser(id: number, data: ICreateUserRequest) {
 
-    // If User exists update user and profile
+    try {
 
-    const userExists = await this.checkIfUserExists(id);
+      // If User exists update user and profile
 
-    if (userExists) {
+      const userExists = await this.checkIfUserExists(id);
 
-      // Update Profile
+      if (userExists) {
 
-      await this.profile.updateProfile(data);
+        // Update Profile
 
-      // Update User
-      // Rehash the password
+        await this.profile.updateProfile(data);
 
-      const password = this.hashPassword(data.password);
+        // Update User
+        // Rehash the password
 
-      const query = 'UPDATE users SET password = ?, email = ? WHERE id = ?;';
-      const values = [password, data.email, id];
+        const password = this.hashPassword(data.password);
 
-      const [result] = await this.pool.query(query, values);
+        const query = 'UPDATE users SET password = ?, email = ? WHERE id = ?;';
+        const values = [password, data.email, id];
 
-      // Get user with profile and return it
+        const [result] = await this.pool.query(query, values);
 
-      const user = this.getById(id, true);
-      return user;
+        // Get user with profile and return it
 
-    }
+        const user = this.getById(id, true);
+        return user;
 
-    throw new Error('User does not exists.');
+      }
+
+      throw new Error('User does not exists.');
+
+    } catch (error: unknown) {
+      console.error(error);
+    } 
 
   }
 
