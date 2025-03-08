@@ -1,5 +1,5 @@
-import IPool from '../interfaces/pool.interface';
-import IProfile from '../interfaces/profile.interface';
+import IPool from '../interfaces/pool.interfaces';
+import IProfile from '../interfaces/profile.interfaces';
 
 const Model = require('./../database/model');
 

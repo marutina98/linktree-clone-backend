@@ -1,4 +1,4 @@
-import IPool from '../interfaces/pool.interface';
+import IPool from '../interfaces/pool.interfaces';
 
 class Model {
 

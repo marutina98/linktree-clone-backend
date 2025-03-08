@@ -1,6 +1,6 @@
-import IPool from '../interfaces/pool.interface';
-import IUser from '../interfaces/user.interface';
-import ICreateUserRequest from '../interfaces/create-user-request.interface';
+import IPool from '../interfaces/pool.interfaces';
+import IUser from '../interfaces/user.interfaces';
+import ICreateUserRequest from '../interfaces/create-user-request.interfaces';
 
 const Model = require('./../database/model');
 const Profile = require('./profile.model');

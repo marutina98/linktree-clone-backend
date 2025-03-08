@@ -1,4 +1,4 @@
-import IProfile from './profile.interface';
+import IProfile from './profile.interfaces';
 
 export default interface IUser {
   id: number,

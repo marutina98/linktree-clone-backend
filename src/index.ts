@@ -4,23 +4,34 @@
 
 export {}
 
-const pool = require('./database/connection');
+const express = require('express');
+const app = express();
 
-const migrate = require('./database/migrate');
+// Middlewares
 
-const User = require('./models/user.model');
-const user = new User(pool);
+const errorHandler = require('./middlewares/error-handler.middleware');
 
-const Profile = require('./models/profile.model');
-const profile = new Profile(pool);
+// Routes
 
-(async () => {
+const userRoutes = require('./routes/users.routes');
 
-  // Migrate Database
+// Environment Variables
 
-  // @todo: migrate database only when needed
-  // maybe a if ?
+const PORT = process.env.PORT;
 
-  // await migrate(pool);
+// Express Middlewares: Body Parser
 
-})();
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+// Routes
+
+app.use('/api/users', userRoutes);
+
+// Express Middleware: Error Handler
+
+app.use(errorHandler);
+
+// Server
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}.`));
