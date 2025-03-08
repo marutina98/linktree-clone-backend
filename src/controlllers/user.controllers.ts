@@ -38,7 +38,22 @@ const getUser = async (request: Request, response: Response, next: Function) => 
 
 }
 
+const createUser = async (request: Request, response: Response, next: Function) => {
+
+}
+
+const updateUser = async (request: Request, response: Response, next: Function) => {
+
+}
+
+const deleteUser = async (request: Request, response: Response, next: Function) => {
+
+}
+
 module.exports = {
   getUsers,
   getUser,
+  createUser,
+  updateUser,
+  deleteUser,
 }

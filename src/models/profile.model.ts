@@ -34,8 +34,6 @@ class Profile extends Model {
 
     const [result] = await this.pool.query(query, values);
 
-    console.log(result);
-
     const profileId = result.insertId;
     const profile = await this.getById(profileId);
 
