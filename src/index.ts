@@ -14,6 +14,7 @@ const errorHandler = require('./middlewares/error-handler.middleware');
 // Routes
 
 const userRoutes = require('./routes/users.routes');
+const profileRoutes = require('./routes/profiles.routes');
 
 // Environment Variables
 
@@ -22,11 +23,12 @@ const PORT = process.env.PORT;
 // Express Middlewares: Body Parser
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
 
 app.use('/api/users', userRoutes);
+app.use('/api/profiles', profileRoutes);
 
 // Express Middleware: Error Handler
 

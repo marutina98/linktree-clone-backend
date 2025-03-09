@@ -45,6 +45,29 @@ class Profile extends Model {
 
     try {
 
+      const profileExists = await this.checkIfProfileExists(userId);
+
+      if (profileExists) {
+
+        const query = [
+          'UPDATE profiles',
+          'SET name = ?, bio = ?',
+          'WHERE user_id = ?'
+        ];
+
+        const values: (string|Buffer)[] = [data.name, data.bio];
+
+        if (data.picture) {
+          const picture = Buffer.from(data.picture, 'base64');
+          values.push(picture);
+          query[1] += ', picture = ?';
+        }
+
+        const [result] = await this.pool.query(query, values);
+        
+
+      }
+
     } catch (error: unknown) {
       console.error(error);
     }
