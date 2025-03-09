@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import IError from '../interfaces/error.interfaces';
+import IError from '../../interfaces/error.interface';
 
 const pool = require('./../database/connection');
 
