@@ -9,4 +9,7 @@ const controller = new UserController(prisma);
 router.get('/', controller.getUsers.bind(controller));
 router.get('/:id', controller.getUser.bind(controller));
 
+router.post('/', controller.createUser.bind(controller));
+router.put('/', controller.updateUser.bind(controller));
+
 export default router;
