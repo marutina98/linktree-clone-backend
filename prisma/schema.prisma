@@ -28,7 +28,7 @@ model Profile {
   name String
   biography String
   picture String @db.Text
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int @unique
 }
 
@@ -38,6 +38,6 @@ model Link {
   name String
   icon String
   order Int
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int @unique
 }
