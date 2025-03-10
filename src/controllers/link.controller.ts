@@ -32,7 +32,31 @@ export default class LinkController {
   }
 
   async getLink(request: Request, response: Response, next: Function): Promise<void> {
-    
+
+    const id = parseInt(request.params.id);
+
+    try {
+
+      const link = await this.prisma.link.findUnique({
+        where: {
+          id
+        }
+      });
+
+      if (!link) {
+        const error = new Error(`The Link with id ${id} was not found.`) as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      response.status(200).json(link);
+
+    } catch (error) {
+      console.error(error);
+    }
+
   }
+
+
   
 }
