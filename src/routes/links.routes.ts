@@ -1,10 +1,10 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-// import controller here
+import LinkController from '../controllers/link.controller';
 
 const router = express.Router();
 const prisma = new PrismaClient();
-// create controller here
+const controller = new LinkController(prisma);
 
 // routes here
 
