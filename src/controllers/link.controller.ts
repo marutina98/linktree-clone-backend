@@ -57,6 +57,35 @@ export default class LinkController {
 
   }
 
+  private async getCorrectOrder(userId: number) {
 
+    try {
+
+      // Get the link with the highest order number
+
+      const maxOrderLink = await this.prisma.link.findFirst({
+
+        where: {
+          userId: userId,
+        },
+
+        orderBy: {
+          order: 'desc',
+        }
+
+      });
+
+      // If the maxOrderLink exists, I return its order + 1
+      // otherwise I return 1.
+
+      const order = maxOrderLink ? maxOrderLink.order++ : 1;
+
+      return order;
+
+    } catch (error) {
+      console.error(error);
+    }
+
+  }
   
 }
