@@ -39,5 +39,5 @@ model Link {
   icon String
   order Int
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int @unique
+  userId Int
 }

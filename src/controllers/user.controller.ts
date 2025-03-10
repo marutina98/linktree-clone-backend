@@ -24,7 +24,7 @@ export default class UserController {
     try {
 
       const users = await this.prisma.user.findMany({
-        
+
         include: {
           profile: true,
           links: true
@@ -215,7 +215,9 @@ export default class UserController {
         where: {
           id
         }
-      })
+      });
+
+      response.status(200).json(deleteUser);
 
     } catch (error) {
       console.error(error);
