@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 
 import IError from '../interfaces/error.interface';
+import ILinkCreateRequest from '../interfaces/link-create-request.interface';
 
 export default class LinkController {
 
@@ -56,6 +57,18 @@ export default class LinkController {
     }
 
   }
+
+  async createLink(request: Request, response: Response, next: Function): Promise<void> {
+
+    // @todo: create link
+
+  }
+
+  // @todo: updateLink
+  // @todo: deleteLink
+
+  // @todo: moveLinkUp
+  // @todo: moveLinkDown
 
   private async getCorrectOrder(userId: number) {
 
