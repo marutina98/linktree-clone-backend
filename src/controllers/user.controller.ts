@@ -1,5 +1,5 @@
 
-import { Request, RequestHandler, Response } from 'express';
+import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 
 import bcrypt from 'bcrypt';
@@ -7,7 +7,6 @@ import bcrypt from 'bcrypt';
 // Interfaces
 
 import IError from '../interfaces/error.interface';
-import IUserUpdateRequest from '../interfaces/user-update-request.interface';
 import IUserCreateRequest from '../interfaces/user-create-request.interface';
 
 // Controller
@@ -25,7 +24,12 @@ export default class UserController {
     try {
 
       const users = await this.prisma.user.findMany({
-        include: { profile: true, links: true }
+        
+        include: {
+          profile: true,
+          links: true
+        }
+
       });
 
       if (!users) {
@@ -49,8 +53,16 @@ export default class UserController {
       const id = parseInt(request.params.id);
 
       const user = await this.prisma.user.findUnique({
-        where: { id },
-        include: { profile: true, links: true }
+
+        where: {
+          id
+        },
+
+        include: {
+          profile: true,
+          links: true
+        }
+
       });
 
       if (!user) {
@@ -75,18 +87,31 @@ export default class UserController {
       const hashedPassword = await this.hashPassword(password);
 
       const user = await this.prisma.user.create({
+
         data: {
+
           email: request.body.email,
           password: hashedPassword,
+
           profile: {
+
             create: {
+
               name: request.body.name,
               biography: '',
               picture: '',
+
             }
+
           }
+
         },
-        include: { profile: true, links: true }
+        
+        include: {
+          profile: true,
+          links: true
+        }
+
       });
 
       if (!user) {
@@ -107,12 +132,7 @@ export default class UserController {
 
     try {
 
-      // const id = request.body.id;
-
-      // const password = (request.body as IUserUpdateRequest).password;
-      // const hashedPassword = await this.hashPassword(password);
-
-      const id = request.body.id;
+      const id = parseInt(request.params.id);
 
       const userDataArr: [string, string|object][] = [];
       const profileDataArr: [string, string][] = [];
@@ -158,9 +178,18 @@ export default class UserController {
       const userDataObject = Object.fromEntries(userDataArr);
 
       const user = await this.prisma.user.update({
-        where: { id },
+
+        where: {
+          id
+        },
+
         data: userDataObject,
-        include: { profile: true, links: true }
+
+        include: {
+          profile: true,
+          links: true
+        }
+
       });
 
       if (!user) {
@@ -178,6 +207,19 @@ export default class UserController {
   }
 
   async deleteUser(request: Request, response: Response, next: Function): Promise<void> {
+
+    try {
+
+      const id = parseInt(request.params.id);
+      const deleteUser = await this.prisma.user.delete({
+        where: {
+          id
+        }
+      })
+
+    } catch (error) {
+      console.error(error);
+    }
 
   }
 
