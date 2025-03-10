@@ -91,7 +91,7 @@ export default class LinkController {
       // If the maxOrderLink exists, I return its order + 1
       // otherwise I return 1.
 
-      const order = maxOrderLink ? maxOrderLink.order++ : 1;
+      const order = maxOrderLink ? maxOrderLink.order + 1 : 1;
 
       return order;
 
