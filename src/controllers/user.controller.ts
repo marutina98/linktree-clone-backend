@@ -118,6 +118,10 @@ export default class UserController {
         include: {
           profile: true,
           links: true
+        },
+
+        omit: {
+          password: true,
         }
 
       });
@@ -196,6 +200,10 @@ export default class UserController {
         include: {
           profile: true,
           links: true
+        },
+
+        omit: {
+          password: true,
         }
 
       });
