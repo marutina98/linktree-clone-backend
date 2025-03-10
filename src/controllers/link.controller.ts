@@ -10,5 +10,29 @@ export default class LinkController {
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
   }
+
+  async getLinks(request: Request, response: Response, next: Function): Promise<void> {
+
+    try {
+
+      const links = await this.prisma.link.findMany();
+
+      if (!links) {
+        const error = new Error(`No links were found.`) as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      response.status(200).json(links);
+
+    } catch (error) {
+      console.error(error);
+    }
+
+  }
+
+  async getLink(request: Request, response: Response, next: Function): Promise<void> {
+    
+  }
   
 }
