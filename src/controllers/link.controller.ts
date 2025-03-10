@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 
 import IError from '../interfaces/error.interface';
-import ILinkCreateRequest from '../interfaces/link-create-request.interface';
+import ILink from '../interfaces/link.interface';
 
 export default class LinkController {
 
@@ -26,7 +26,7 @@ export default class LinkController {
 
       response.status(200).json(links);
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(error);
     }
 
@@ -52,7 +52,7 @@ export default class LinkController {
 
       response.status(200).json(link);
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(error);
     }
 
@@ -60,44 +60,235 @@ export default class LinkController {
 
   async createLink(request: Request, response: Response, next: Function): Promise<void> {
 
-    // @todo: create link
+    try {
+
+      const id = parseInt(request.body.id);
+
+      const data = request.body as ILink;
+      data.order = await this.getCorrectOrder(id);
+
+      const link = this.prisma.link.create({ data });
+
+      if (!link) {
+        const error = new Error(`The Link could not be created.`) as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      response.status(200).json(link);
+
+    } catch (error: unknown) {
+      console.error(error);
+    }
 
   }
 
   // @todo: updateLink
   // @todo: deleteLink
 
-  // @todo: moveLinkUp
-  // @todo: moveLinkDown
-
-  private async getCorrectOrder(userId: number) {
+  public async moveLinkUp(response: Response, request: Request, next: Function) {
 
     try {
 
-      // Get the link with the highest order number
+      const id = parseInt(request.params.id);
 
-      const maxOrderLink = await this.prisma.link.findFirst({
+      const linkToMoveUp = await this.prisma.link.findUnique({
 
         where: {
-          userId: userId,
-        },
-
-        orderBy: {
-          order: 'desc',
+          id
         }
 
       });
 
-      // If the maxOrderLink exists, I return its order + 1
-      // otherwise I return 1.
+      // If the link does not exists, throw error.
+      // If the order of the link is already 1, it cannot be moved up.
+      
+      if (!linkToMoveUp) {
+        const error = new Error(`The Link could not be found.`) as IError;
+        error.status = 500;
+        next(error);
+      }
 
-      const order = maxOrderLink ? maxOrderLink.order + 1 : 1;
+      if (linkToMoveUp!.order <= 1) {
+        const error = new Error(`The Link could not be moved up.`) as IError;
+        error.status = 500;
+        next(error);
+      }
 
-      return order;
+      // If the link to move up exists, we get the link to
+      // move down (the link above it) and update its order also
 
-    } catch (error) {
+      // To find it, we need the userId and the currentOrder
+
+      const userId = linkToMoveUp!.userId;
+      const currentOrder = linkToMoveUp!.order;
+
+      const linkToMoveDown = await this.prisma.link.findFirst({
+        where: {
+          userId,
+          order: currentOrder - 1
+        }
+      });
+
+      if (!linkToMoveDown) {
+        const error = new Error(`The Link Above it does not exist.`) as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      // We update the orders with a batch query
+
+      const result = await this.prisma.$transaction([
+
+        this.prisma.link.update({
+
+          where: {
+            id: linkToMoveUp!.id,
+          },
+
+          data: {
+            order: currentOrder - 1,
+          }
+
+        }),
+
+        this.prisma.link.update({
+
+          where: {
+            id: linkToMoveDown!.id,
+          },
+
+          data: {
+            order: currentOrder,
+          }
+
+        }),
+
+      ]);
+
+      response.status(200).json(result);
+
+    } catch (error: unknown) {
       console.error(error);
     }
+
+  }
+
+  public async moveLinkDown(response: Response, request: Request, next: Function) {
+
+    try {
+
+      const id = parseInt(request.params.id);
+
+      const linkToMoveDown = await this.prisma.link.findUnique({
+
+        where: {
+          id
+        }
+
+      });
+
+      // If the link does not exists, throw error.
+      // If the order of the link is already the max, it cannot be moved down.
+      
+      if (!linkToMoveDown) {
+        const error = new Error(`The Link could not be found.`) as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      const userId = linkToMoveDown!.userId;
+      const maxOrder = await this.getMaxOrder(linkToMoveDown!.userId);
+
+      if (linkToMoveDown!.order === maxOrder) {
+        const error = new Error(`The Link could not be moved down.`) as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      // If the link to move down exists, we get the link to
+      // move up (the link under it) and update its order also
+
+      // To find it, we need the userId and the currentOrder
+      
+      const currentOrder = linkToMoveDown!.order;
+
+      const linkToMoveUp = await this.prisma.link.findFirst({
+        where: {
+          userId,
+          order: currentOrder + 1
+        }
+      });
+
+      if (!linkToMoveUp) {
+        const error = new Error(`The Link Under it does not exist.`) as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      // We update the orders with a batch query
+
+      const result = await this.prisma.$transaction([
+
+        this.prisma.link.update({
+
+          where: {
+            id: linkToMoveUp!.id,
+          },
+
+          data: {
+            order: currentOrder + 1,
+          }
+
+        }),
+
+        this.prisma.link.update({
+
+          where: {
+            id: linkToMoveDown!.id,
+          },
+
+          data: {
+            order: currentOrder,
+          }
+
+        }),
+
+      ]);
+
+      response.status(200).json(result);
+
+    } catch (error: unknown) {
+      console.error(error);
+    }
+
+  }
+
+  private async getCorrectOrder(userId: number): Promise<number> {
+    const maxOrder = await this.getMaxOrder(userId);
+    return maxOrder + 1;
+  }
+
+  private async getMaxOrder(userId: number): Promise<number> {
+
+    // Get the link with the highest order number
+
+    const maxOrderLink = await this.prisma.link.findFirst({
+
+      where: {
+        userId: userId,
+      },
+
+      orderBy: {
+        order: 'desc',
+      }
+
+    });
+
+    // If the maxOrderLink exists, I return its order + 1
+    // otherwise I return 1.
+
+    return maxOrderLink ? maxOrderLink.order : 0;
 
   }
   
