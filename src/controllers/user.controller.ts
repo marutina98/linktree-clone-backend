@@ -13,13 +13,11 @@ import IUserCreateRequest from '../interfaces/user-create-request.interface';
 
 export default class UserController {
 
-  private prisma = prisma;
-
   async getUsers(request: Request, response: Response, next: Function): Promise<void> {
 
     try {
 
-      const users = await this.prisma.user.findMany({
+      const users = await prisma.user.findMany({
 
         include: {
           profile: true,
@@ -52,7 +50,7 @@ export default class UserController {
 
       const id = parseInt(request.params.id);
 
-      const user = await this.prisma.user.findUnique({
+      const user = await prisma.user.findUnique({
 
         where: {
           id
@@ -90,7 +88,7 @@ export default class UserController {
       const password = (request.body as IUserCreateRequest).password;
       const hashedPassword = await this.hashPassword(password);
 
-      const user = await this.prisma.user.create({
+      const user = await prisma.user.create({
 
         data: {
 
@@ -185,7 +183,7 @@ export default class UserController {
 
       const userDataObject = Object.fromEntries(userDataArr);
 
-      const user = await this.prisma.user.update({
+      const user = await prisma.user.update({
 
         where: {
           id
@@ -223,7 +221,7 @@ export default class UserController {
     try {
 
       const id = parseInt(request.params.id);
-      const deleteUser = await this.prisma.user.delete({
+      const deleteUser = await prisma.user.delete({
         where: {
           id
         }

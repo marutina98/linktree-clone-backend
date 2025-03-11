@@ -7,13 +7,11 @@ import ILinkUpdateRequest from '../interfaces/link-update-request.interface';
 
 export default class LinkController {
 
-  private prisma = prisma;
-
   async getLinks(request: Request, response: Response, next: Function): Promise<void> {
 
     try {
 
-      const links = await this.prisma.link.findMany();
+      const links = await prisma.link.findMany();
 
       if (!links) {
         const error = new Error(`No links were found.`) as IError;
@@ -35,7 +33,7 @@ export default class LinkController {
 
     try {
 
-      const link = await this.prisma.link.findUnique({
+      const link = await prisma.link.findUnique({
         where: {
           id
         }
@@ -64,7 +62,7 @@ export default class LinkController {
       const data = request.body as ILink;
       data.order = await this.getCorrectOrder(id);
 
-      const link = this.prisma.link.create({ data });
+      const link = prisma.link.create({ data });
 
       if (!link) {
         const error = new Error(`The Link could not be created.`) as IError;
@@ -89,7 +87,7 @@ export default class LinkController {
       const id = parseInt(request.params.id);
       const data: ILinkUpdateRequest = request.body;
 
-      const link = await this.prisma.link.update({
+      const link = await prisma.link.update({
 
         where: {
           id
@@ -118,7 +116,7 @@ export default class LinkController {
     try {
 
       const id = parseInt(request.params.id);
-      const deleteLink = await this.prisma.link.delete({
+      const deleteLink = await prisma.link.delete({
         where: {
           id
         }
@@ -138,7 +136,7 @@ export default class LinkController {
 
       const id = parseInt(request.params.id);
 
-      const linkToMoveUp = await this.prisma.link.findUnique({
+      const linkToMoveUp = await prisma.link.findUnique({
 
         where: {
           id
@@ -169,7 +167,7 @@ export default class LinkController {
       const userId = linkToMoveUp!.userId;
       const currentOrder = linkToMoveUp!.order;
 
-      const linkToMoveDown = await this.prisma.link.findFirst({
+      const linkToMoveDown = await prisma.link.findFirst({
         where: {
           userId,
           order: currentOrder - 1
@@ -184,9 +182,9 @@ export default class LinkController {
 
       // We update the orders with a batch query
 
-      const result = await this.prisma.$transaction([
+      const result = await prisma.$transaction([
 
-        this.prisma.link.update({
+        prisma.link.update({
 
           where: {
             id: linkToMoveUp!.id,
@@ -198,7 +196,7 @@ export default class LinkController {
 
         }),
 
-        this.prisma.link.update({
+        prisma.link.update({
 
           where: {
             id: linkToMoveDown!.id,
@@ -226,7 +224,7 @@ export default class LinkController {
 
       const id = parseInt(request.params.id);
 
-      const linkToMoveDown = await this.prisma.link.findUnique({
+      const linkToMoveDown = await prisma.link.findUnique({
 
         where: {
           id
@@ -259,7 +257,7 @@ export default class LinkController {
       
       const currentOrder = linkToMoveDown!.order;
 
-      const linkToMoveUp = await this.prisma.link.findFirst({
+      const linkToMoveUp = await prisma.link.findFirst({
         where: {
           userId,
           order: currentOrder + 1
@@ -274,9 +272,9 @@ export default class LinkController {
 
       // We update the orders with a batch query
 
-      const result = await this.prisma.$transaction([
+      const result = await prisma.$transaction([
 
-        this.prisma.link.update({
+        prisma.link.update({
 
           where: {
             id: linkToMoveUp!.id,
@@ -288,7 +286,7 @@ export default class LinkController {
 
         }),
 
-        this.prisma.link.update({
+        prisma.link.update({
 
           where: {
             id: linkToMoveDown!.id,
@@ -319,7 +317,7 @@ export default class LinkController {
 
     // Get the link with the highest order number
 
-    const maxOrderLink = await this.prisma.link.findFirst({
+    const maxOrderLink = await prisma.link.findFirst({
 
       where: {
         userId: userId,
