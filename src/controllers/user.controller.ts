@@ -205,7 +205,7 @@ export default class UserController {
       });
 
       if (!user) {
-        const error = new Error(`User could not be created.`) as IError;
+        const error = new Error(`User could not be update.`) as IError;
         error.status = 409;
         next(error);
       }

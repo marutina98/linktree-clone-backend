@@ -3,6 +3,7 @@ import { prisma } from '../services/prisma.service';
 
 import IError from '../interfaces/error.interface';
 import ILink from '../interfaces/link.interface';
+import ILinkUpdateRequest from '../interfaces/link-update-request.interface';
 
 export default class LinkController {
 
@@ -83,9 +84,32 @@ export default class LinkController {
 
   public async updateLink(response: Response, request: Request, next: Function) {
 
-  }
+    try {
 
-  // @todo: deleteLink
+      const id = parseInt(request.params.id);
+      const data: ILinkUpdateRequest = request.body;
+
+      const link = await this.prisma.link.update({
+
+        where: {
+          id
+        },
+
+        data
+
+      });
+
+      if (!link) {
+        const error = new Error(`Link could not be updated.`) as IError;
+        error.status = 409;
+        next(error);
+      }
+
+    } catch (error: unknown) {
+      console.error(error);
+    }
+
+  }
 
   public async deleteLink(response: Response, request: Request, next: Function) {
     
