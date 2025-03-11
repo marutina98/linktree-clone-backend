@@ -12,6 +12,7 @@ import IError from '../interfaces/error.interface';
 import IUserCreateRequest from '../interfaces/user-create-request.interface';
 
 import { User } from '@prisma/client';
+import IOptionalPassword from '../interfaces/optional-password.interface';
 
 export default class AuthenticationController {
 
@@ -63,9 +64,10 @@ export default class AuthenticationController {
         next(error);
       }
 
+      const token = this.generateJsonWebToken(user);
       const userWithToken = {
         ...user,
-        token: this.generateJsonWebToken(user),
+        token
       }
 
       response.status(201).json(userWithToken);
@@ -77,6 +79,60 @@ export default class AuthenticationController {
   }
 
   async login(request: Request, response: Response, next: Function): Promise<void> {
+
+    try {
+
+      // Find the user using the received email
+      // I include the profile and the links
+
+      const user = await prisma.user.findUnique({
+
+        where: {
+          email: request.body.email,
+        },
+        
+        include: {
+          profile: true,
+          links: true
+        }
+
+      });
+
+      if (!user) {
+        const error = new Error(`User could not be found.`) as IError;
+        error.status = 409;
+        next(error);
+      }
+
+      const hashedPassword = user!.password;
+      const receivedPassword = request.body.password;
+      const isPasswordCorrect = await bcryptService.comparePasswords(receivedPassword, hashedPassword);
+
+      // If the password is wrong
+      // throw an error, otherwise continue
+
+      if (!isPasswordCorrect) {
+        const error = new Error('Password is not correct') as IError;
+        error.status = 401;
+        next(error);
+      }
+
+      // Delete the password from the received User
+      // Generate token and return it
+
+      delete (user as IOptionalPassword)!.password;
+
+      const token = this.generateJsonWebToken(user as User);
+      const userWithToken = {
+        ...user,
+        token
+      }
+
+      response.status(200).json(userWithToken);
+      
+    } catch (error: unknown) {
+      console.error(error);
+    }
 
   }
 

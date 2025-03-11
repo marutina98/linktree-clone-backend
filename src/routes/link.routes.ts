@@ -1,15 +1,15 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import LinkController from '../controllers/link.controller';
 
 const router = express.Router();
 const controller = new LinkController();
 
-router.get('/', controller.getLinks);
-router.get('/:id', controller.getLink);
-router.post('/', controller.createLink);
-router.put('/:id/move-up', controller.moveLinkUp);
-router.put('/:id/move-down', controller.moveLinkDown);
-router.put('/:id', controller.updateLink);
-router.delete('/:id', controller.deleteLink);
+router.get('/', (request: Request, response: Response, next: Function) => controller.getLinks(request, response, next));
+router.get('/:id', (request: Request, response: Response, next: Function) => controller.getLink(request, response, next));
+router.post('/', (request: Request, response: Response, next: Function) => controller.createLink(request, response, next));
+router.put('/:id/move-up', (request: Request, response: Response, next: Function) => controller.moveLinkUp(request, response, next));
+router.put('/:id/move-down', (request: Request, response: Response, next: Function) => controller.moveLinkDown(request, response, next));
+router.put('/:id', (request: Request, response: Response, next: Function) => controller.updateLink(request, response, next));
+router.delete('/:id', (request: Request, response: Response, next: Function) => controller.deleteLink(request, response, next));
 
 export default router;
