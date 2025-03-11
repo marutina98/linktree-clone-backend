@@ -78,9 +78,7 @@ export default class LinkController {
 
   }
 
-  // @todo: updateLink
-
-  public async updateLink(response: Response, request: Request, next: Function) {
+  public async updateLink(request: Request, response: Response, next: Function): Promise<void> {
 
     try {
 
@@ -111,7 +109,7 @@ export default class LinkController {
 
   }
 
-  public async deleteLink(response: Response, request: Request, next: Function) {
+  public async deleteLink(request: Request, response: Response, next: Function): Promise<void> {
     
     try {
 
@@ -130,7 +128,7 @@ export default class LinkController {
     
   }
 
-  public async moveLinkUp(response: Response, request: Request, next: Function) {
+  public async moveLinkUp(request: Request, response: Response, next: Function): Promise<void> {
 
     try {
 
@@ -218,7 +216,7 @@ export default class LinkController {
 
   }
 
-  public async moveLinkDown(response: Response, request: Request, next: Function) {
+  public async moveLinkDown(request: Request, response: Response, next: Function): Promise<void> {
 
     try {
 
