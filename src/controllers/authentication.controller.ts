@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { sign } from 'jsonwebtoken';
 
 // Services
 
@@ -59,7 +60,12 @@ export default class AuthenticationController {
         next(error);
       }
 
-      response.status(201).json(user);
+      const userWithToken = {
+        ...user,
+        // token: this.generateJsonWebToken(user);
+      }
+
+      response.status(201).json(userWithToken);
 
     } catch (error) {
       console.error(error);
@@ -73,6 +79,12 @@ export default class AuthenticationController {
 
   async logout(request: Request, response: Response, next: Function): Promise<void> {
 
+  }
+
+  generateJsonWebToken(user: User) {
+    return sign({
+      email: user.email
+    }, 'JWT_SECRET');
   }
 
 }

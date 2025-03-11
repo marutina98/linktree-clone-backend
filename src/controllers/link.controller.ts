@@ -1,9 +1,12 @@
 import { Request, Response } from 'express';
 import { prisma } from '../services/prisma.service';
 
+// Interfaces & Types
+
 import IError from '../interfaces/error.interface';
-import ILink from '../interfaces/link.interface';
 import ILinkUpdateRequest from '../interfaces/link-update-request.interface';
+
+import { Link } from '@prisma/client';
 
 export default class LinkController {
 
@@ -59,7 +62,7 @@ export default class LinkController {
 
       const id = parseInt(request.body.id);
 
-      const data = request.body as ILink;
+      const data = request.body as Link;
       data.order = await this.getCorrectOrder(id);
 
       const link = prisma.link.create({ data });
