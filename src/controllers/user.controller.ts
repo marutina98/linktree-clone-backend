@@ -1,6 +1,6 @@
 
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../services/prisma.service';
 
 import bcrypt from 'bcrypt';
 
@@ -13,11 +13,7 @@ import IUserCreateRequest from '../interfaces/user-create-request.interface';
 
 export default class UserController {
 
-  private prisma: PrismaClient;
-
-  constructor(prisma: PrismaClient) {
-    this.prisma = prisma;
-  }
+  private prisma = prisma;
 
   async getUsers(request: Request, response: Response, next: Function): Promise<void> {
 

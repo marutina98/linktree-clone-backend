@@ -1,16 +1,12 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../services/prisma.service';
 
 import IError from '../interfaces/error.interface';
 import ILink from '../interfaces/link.interface';
 
 export default class LinkController {
 
-  private prisma: PrismaClient;
-
-  constructor(prisma: PrismaClient) {
-    this.prisma = prisma;
-  }
+  private prisma = prisma;
 
   async getLinks(request: Request, response: Response, next: Function): Promise<void> {
 

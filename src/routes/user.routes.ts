@@ -1,9 +1,8 @@
 import express from 'express';
 import UserController from '../controllers/user.controller';
-import { prisma } from '../services/prisma.service';
 
 const router = express.Router();
-const controller = new UserController(prisma);
+const controller = new UserController();
 
 router.get('/', controller.getUsers.bind(controller));
 router.get('/:id', controller.getUser.bind(controller));
