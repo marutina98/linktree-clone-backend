@@ -16,6 +16,5 @@ const controller = new AuthenticationController();
 
 router.post('/register', isGuest, (request: Request, response: Response, next: Function) => controller.registerUser(request, response, next));
 router.post('/login', isGuest, (request: Request, response: Response, next: Function) => controller.login(request, response, next));
-router.post('/logout', isAuthenticated, (request: Request, response: Response, next: Function) => controller.logout(request, response, next));
 
 export default router;

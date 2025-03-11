@@ -136,10 +136,6 @@ export default class AuthenticationController {
 
   }
 
-  async logout(request: Request, response: Response, next: Function): Promise<void> {
-
-  }
-
   // Generate JsonWebToken for newly registered/logged in user.
   // I omit password because it's not needed.
 
