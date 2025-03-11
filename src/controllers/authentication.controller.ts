@@ -5,10 +5,12 @@ import { Request, Response } from 'express';
 import { prisma } from './../services/prisma.service';
 import { bcryptService } from '../services/bcrypt.service';
 
-// Interfaces
+// Interfaces & Types
 
 import IError from '../interfaces/error.interface';
 import IUserCreateRequest from '../interfaces/user-create-request.interface';
+
+import { User } from '@prisma/client';
 
 export default class AuthenticationController {
 
@@ -62,6 +64,14 @@ export default class AuthenticationController {
     } catch (error) {
       console.error(error);
     }
+
+  }
+
+  async login(request: Request, response: Response, next: Function): Promise<void> {
+
+  }
+
+  async logout(request: Request, response: Response, next: Function): Promise<void> {
 
   }
 

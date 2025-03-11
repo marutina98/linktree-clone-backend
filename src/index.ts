@@ -11,6 +11,7 @@ import errorHandlerMiddleware from './middlewares/errorHandler';
 
 import userRoutes from './routes/user.routes';
 import linkRoutes from './routes/link.routes';
+import authenticationRoutes from './routes/authentication.routes';
 
 // Express
 
@@ -30,6 +31,7 @@ app.use(errorHandlerMiddleware);
 
 app.use('/api/users', userRoutes);
 app.use('/api/links', linkRoutes);
+app.use('/api/authentication', authenticationRoutes);
 
 // Start Server
 
