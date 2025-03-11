@@ -5,7 +5,7 @@ const PORT = process.env.PORT;
 
 // Imports
 
-import errorHandlerMiddleware from './middlewares/errorHandler';
+import errorHandlerMiddleware from './middlewares/error-handler.middleware';
 
 // Import Routes
 
