@@ -105,6 +105,8 @@ export default class LinkController {
         next(error);
       }
 
+      response.status(202).json(link);
+
     } catch (error: unknown) {
       console.error(error);
     }
