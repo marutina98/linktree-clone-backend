@@ -6,7 +6,11 @@ const PORT = process.env.PORT;
 // Imports
 
 import errorHandlerMiddleware from './middlewares/errorHandler';
+
+// Import Routes
+
 import userRoutes from './routes/user.routes';
+import linkRoutes from './routes/link.routes';
 
 // Express
 
@@ -25,6 +29,7 @@ app.use(errorHandlerMiddleware);
 // Express Routes
 
 app.use('/api/users', userRoutes);
+app.use('/api/links', linkRoutes);
 
 // Start Server
 

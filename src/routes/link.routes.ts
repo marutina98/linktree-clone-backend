@@ -6,8 +6,10 @@ const controller = new LinkController();
 
 router.get('/', controller.getLinks);
 router.get('/:id', controller.getLink);
-
+router.post('/', controller.createLink);
 router.put('/:id/move-up', controller.moveLinkUp);
 router.put('/:id/move-down', controller.moveLinkDown);
+router.put('/:id', controller.updateLink);
+router.delete('/:id', controller.deleteLink);
 
 export default router;
