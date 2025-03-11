@@ -15,6 +15,9 @@ import { User } from '@prisma/client';
 
 export default class AuthenticationController {
 
+  // I register the user and hash their password
+  // before sending it to the database
+
   async registerUser(request: Request, response: Response, next: Function): Promise<void> {
 
     try {
@@ -62,7 +65,7 @@ export default class AuthenticationController {
 
       const userWithToken = {
         ...user,
-        // token: this.generateJsonWebToken(user);
+        token: this.generateJsonWebToken(user),
       }
 
       response.status(201).json(userWithToken);
@@ -81,7 +84,10 @@ export default class AuthenticationController {
 
   }
 
-  generateJsonWebToken(user: User) {
+  // Generate JsonWebToken for newly registered/logged in user.
+  // I omit password because it's not needed.
+
+  generateJsonWebToken(user: Omit<User, 'password'>) {
     return sign({
       email: user.email
     }, 'JWT_SECRET');
