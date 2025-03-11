@@ -80,7 +80,31 @@ export default class LinkController {
   }
 
   // @todo: updateLink
+
+  public async updateLink(response: Response, request: Request, next: Function) {
+
+  }
+
   // @todo: deleteLink
+
+  public async deleteLink(response: Response, request: Request, next: Function) {
+    
+    try {
+
+      const id = parseInt(request.params.id);
+      const deleteLink = await this.prisma.link.delete({
+        where: {
+          id
+        }
+      });
+
+      response.status(200).json(deleteLink);
+
+    } catch (error) {
+      console.error(error);
+    }
+    
+  }
 
   public async moveLinkUp(response: Response, request: Request, next: Function) {
 
