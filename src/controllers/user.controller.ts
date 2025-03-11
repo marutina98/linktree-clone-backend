@@ -1,13 +1,15 @@
 
 import { Request, Response } from 'express';
+
+// Services
+
 import { prisma } from '../services/prisma.service';
 
-import bcrypt from 'bcrypt';
+import { bcryptService } from '../services/bcrypt.service';
 
 // Interfaces
 
 import IError from '../interfaces/error.interface';
-import IUserCreateRequest from '../interfaces/user-create-request.interface';
 
 // Controller
 
@@ -81,59 +83,6 @@ export default class UserController {
 
   }
 
-  async createUser(request: Request, response: Response, next: Function): Promise<void> {
-
-    try {
-
-      const password = (request.body as IUserCreateRequest).password;
-      const hashedPassword = await this.hashPassword(password);
-
-      const user = await prisma.user.create({
-
-        data: {
-
-          email: request.body.email,
-          password: hashedPassword,
-
-          profile: {
-
-            create: {
-
-              name: request.body.name,
-              biography: '',
-              picture: '',
-
-            }
-
-          }
-
-        },
-        
-        include: {
-          profile: true,
-          links: true
-        },
-
-        omit: {
-          password: true,
-        }
-
-      });
-
-      if (!user) {
-        const error = new Error(`User could not be created.`) as IError;
-        error.status = 409;
-        next(error);
-      }
-
-      response.status(201).json(user);
-
-    } catch (error) {
-      console.error(error);
-    }
-
-  }
-
   async updateUser(request: Request, response: Response, next: Function): Promise<void> {
 
     try {
@@ -160,7 +109,7 @@ export default class UserController {
           // hash the password
 
           const value = key === 'password' ?
-                        await this.hashPassword(_value as string) : _value;
+                        await bcryptService.hashPassword(_value as string) : _value;
 
           userDataArr.push([key, value as string]);
 
@@ -233,14 +182,6 @@ export default class UserController {
       console.error(error);
     }
 
-  }
-
-  async hashPassword(password: string, saltRounds: number = 10) {
-    return bcrypt.hash(password, saltRounds);
-  }
-
-  async comparePasswords(password: string, hash: string) {
-    return bcrypt.compare(password, hash);
   }
 
 }
