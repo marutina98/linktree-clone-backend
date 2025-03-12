@@ -20,7 +20,6 @@ export default async function isAuthenticated(request: IRequestWithUser, respons
   if (!authorizationHeader) {
     const error = (new Error('User is not authenticated')) as IError;
     error.status = 403;
-    next(error);
   }
 
   const token = authorizationHeader?.split(' ')[1];
@@ -28,7 +27,6 @@ export default async function isAuthenticated(request: IRequestWithUser, respons
   if (!token) {
     const error = (new Error('Token is not present.')) as IError;
     error.status = 403;
-    next(error);
   }
 
   try {
@@ -44,6 +42,8 @@ export default async function isAuthenticated(request: IRequestWithUser, respons
       });
   
       request.user = user ?? undefined;
+
+      next();
 
     }    
 

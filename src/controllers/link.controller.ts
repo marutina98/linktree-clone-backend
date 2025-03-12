@@ -1,6 +1,11 @@
 import { Request, Response } from 'express';
 import { prisma } from '../services/prisma.service';
 
+interface ILinkUpdate {
+  id: number,
+  order: number
+}
+
 // Interfaces & Types
 
 import IError from '../interfaces/error.interface';
@@ -131,181 +136,167 @@ export default class LinkController {
     
   }
 
-  public async moveLinkUp(request: Request, response: Response, next: Function): Promise<void> {
+  // Move the Link up and the Link above down.
+
+  public async moveLinkUp(request: Request, response: Response, next: Function) {
 
     try {
-
+      
       const id = parseInt(request.params.id);
 
-      const linkToMoveUp = await prisma.link.findUnique({
+      if (isNaN(id)) {
+        const error = new Error('The received id is not a number.') as IError;
+        error.status = 400;
+        next(error);
+      }
 
+      // Find Unique or Throw Error
+
+      const link = await prisma.link.findUniqueOrThrow({
         where: {
           id
         }
-
       });
 
-      // If the link does not exists, throw error.
-      // If the order of the link is already 1, it cannot be moved up.
-      
-      if (!linkToMoveUp) {
-        const error = new Error(`The Link could not be found.`) as IError;
-        error.status = 500;
+      const currentOrder = link!.order;
+
+      // If the link is already at the highest position
+      // throw an error
+
+      if (currentOrder <= 1) {
+        const error = new Error(`Link with ${id} id could not be moved down.`) as IError;
+        error.status = 400;
         next(error);
       }
 
-      if (linkToMoveUp!.order <= 1) {
-        const error = new Error(`The Link could not be moved up.`) as IError;
-        error.status = 500;
-        next(error);
-      }
+      // Get userId from link
+      // Find above link or throw error
 
-      // If the link to move up exists, we get the link to
-      // move down (the link above it) and update its order also
-
-      // To find it, we need the userId and the currentOrder
-
-      const userId = linkToMoveUp!.userId;
-      const currentOrder = linkToMoveUp!.order;
-
-      const linkToMoveDown = await prisma.link.findFirst({
+      const userId = link!.userId;
+      const aboveLink = await prisma.link.findFirstOrThrow({
         where: {
           userId,
           order: currentOrder - 1
         }
       });
 
-      if (!linkToMoveDown) {
-        const error = new Error(`The Link Above it does not exist.`) as IError;
-        error.status = 500;
-        next(error);
-      }
+      const newLinkOrder: [ILinkUpdate, ILinkUpdate] = [
 
-      // We update the orders with a batch query
+        {
+          id: link.id,
+          order: aboveLink.order,
+        },
 
-      const result = await prisma.$transaction([
+        {
+          id: aboveLink.id,
+          order: currentOrder
+        }
 
-        prisma.link.update({
+      ];
 
-          where: {
-            id: linkToMoveUp!.id,
-          },
-
-          data: {
-            order: currentOrder - 1,
-          }
-
-        }),
-
-        prisma.link.update({
-
-          where: {
-            id: linkToMoveDown!.id,
-          },
-
-          data: {
-            order: currentOrder,
-          }
-
-        }),
-
-      ]);
+      const result = await this.updateLinkOrder(newLinkOrder);
 
       response.status(200).json(result);
 
-    } catch (error: unknown) {
+    } catch(error: unknown) {
       console.error(error);
     }
 
   }
 
-  public async moveLinkDown(request: Request, response: Response, next: Function): Promise<void> {
+  // Move the Link down and the under link up.
+
+  public async moveLinkDown(request: Request, response: Response, next: Function) {
 
     try {
-
       const id = parseInt(request.params.id);
 
-      const linkToMoveDown = await prisma.link.findUnique({
+      if (isNaN(id)) {
+        const error = new Error('The received id is not a number.') as IError;
+        error.status = 400;
+        next(error);
+      }
 
+      // Find Unique or Throw Error
+
+      const link = await prisma.link.findUniqueOrThrow({
         where: {
           id
         }
-
       });
 
-      // If the link does not exists, throw error.
-      // If the order of the link is already the max, it cannot be moved down.
-      
-      if (!linkToMoveDown) {
-        const error = new Error(`The Link could not be found.`) as IError;
-        error.status = 500;
+      const currentOrder = link!.order;
+
+      // Get userId from Link
+      // Use userId to get the possible maxOrder
+      // If the maxOrderReceived is 0, maxOrder is 1 otherwise is maxOrderReceived
+
+      const userId = link!.userId;
+      const maxOrderReceived = await this.getMaxOrder(userId);
+      const maxOrder = maxOrderReceived === 0 ? 1 : maxOrderReceived;
+
+      // If the link is already at the highest position
+      // throw an error
+
+      if (currentOrder >= maxOrder) {
+        const error = new Error(`Link with ${id} id could not be moved down.`) as IError;
+        error.status = 400;
         next(error);
       }
 
-      const userId = linkToMoveDown!.userId;
-      const maxOrder = await this.getMaxOrder(linkToMoveDown!.userId);
+      // Find under link or throw error
 
-      if (linkToMoveDown!.order === maxOrder) {
-        const error = new Error(`The Link could not be moved down.`) as IError;
-        error.status = 500;
-        next(error);
-      }
-
-      // If the link to move down exists, we get the link to
-      // move up (the link under it) and update its order also
-
-      // To find it, we need the userId and the currentOrder
-      
-      const currentOrder = linkToMoveDown!.order;
-
-      const linkToMoveUp = await prisma.link.findFirst({
+      const underLink = await prisma.link.findFirstOrThrow({
         where: {
           userId,
           order: currentOrder + 1
         }
       });
 
-      if (!linkToMoveUp) {
-        const error = new Error(`The Link Under it does not exist.`) as IError;
-        error.status = 500;
-        next(error);
-      }
+      const newLinkOrder: [ILinkUpdate, ILinkUpdate] = [
 
-      // We update the orders with a batch query
+        {
+          id: link.id,
+          order: underLink.order,
+        },
 
-      const result = await prisma.$transaction([
+        {
+          id: underLink.id,
+          order: currentOrder
+        }
 
-        prisma.link.update({
+      ];
+      
+      const result = await this.updateLinkOrder(newLinkOrder);
 
-          where: {
-            id: linkToMoveUp!.id,
-          },
+      response.status(200).json(result); 
 
-          data: {
-            order: currentOrder + 1,
-          }
-
-        }),
-
-        prisma.link.update({
-
-          where: {
-            id: linkToMoveDown!.id,
-          },
-
-          data: {
-            order: currentOrder,
-          }
-
-        }),
-
-      ]);
-
-      response.status(200).json(result);
-
-    } catch (error: unknown) {
+    } catch(error: unknown) {
       console.error(error);
     }
+
+  }
+
+  public async updateLinkOrder(links: [ILinkUpdate, ILinkUpdate]) {
+    return prisma.$transaction([
+      prisma.link.update({
+        where: {
+          id: links[0].id,
+        },
+        data: {
+          order: links[0].order,
+        }
+      }),
+
+      prisma.link.update({
+        where: {
+          id: links[1].id,
+        },
+        data: {
+          order: links[1].order,
+        }
+      })
+    ]);
 
   }
 
