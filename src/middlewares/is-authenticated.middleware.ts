@@ -23,7 +23,7 @@ export default async function isAuthenticated(request: IRequestWithUser, respons
     next(error);
   }
 
-  const token = authorizationHeader!.split(' ')[1];
+  const token = authorizationHeader?.split(' ')[1];
 
   if (!token) {
     const error = (new Error('Token is not present.')) as IError;
@@ -33,15 +33,19 @@ export default async function isAuthenticated(request: IRequestWithUser, respons
 
   try {
 
-    const decodedToken = verify(token, 'JWT_SECRET') as IEmail;
-    
-    const user = await prisma.user.findUnique({
-      where: {
-        email: decodedToken.email
-      }
-    });
+    if (token) {
 
-    request.user = user ?? undefined;
+      const decodedToken = verify(token, 'JWT_SECRET') as IEmail;
+    
+      const user = await prisma.user.findUnique({
+        where: {
+          email: decodedToken.email
+        }
+      });
+  
+      request.user = user ?? undefined;
+
+    }    
 
   } catch (error: unknown) {
     request.user = undefined;

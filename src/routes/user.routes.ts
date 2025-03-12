@@ -7,6 +7,7 @@ import UserController from '../controllers/user.controller';
 // Middleware
 
 import isAuthenticated from '../middlewares/is-authenticated.middleware';
+import isOwnerUser from '../middlewares/is-owner-user.middleware';
 
 // Routes
 
@@ -15,7 +16,7 @@ const controller = new UserController();
 
 router.get('/', (request: Request, response: Response, next: Function) => controller.getUsers(request, response, next));
 router.get('/:id', (request: Request, response: Response, next: Function) => controller.getUser(request, response, next));
-router.put('/:id', isAuthenticated, (request: Request, response: Response, next: Function) => controller.updateUser(request, response, next));
-router.delete('/:id', isAuthenticated, (request: Request, response: Response, next: Function) => controller.deleteUser(request, response, next));
+router.put('/:id', isAuthenticated, isOwnerUser, (request: Request, response: Response, next: Function) => controller.updateUser(request, response, next));
+router.delete('/:id', isAuthenticated, isOwnerUser, (request: Request, response: Response, next: Function) => controller.deleteUser(request, response, next));
 
 export default router;

@@ -26,13 +26,17 @@ export default async function isGuest(request: Request, response: Response, next
 
   try {
 
-      verify(token, 'JWT_SECRET') as IEmail;
+      if (token) {
 
-      // Throw an error if the token is valid
-      
-      const error = new Error('User is not a guest.') as IError;
-      error.status = 401;
-      throw error;
+        verify(token, 'JWT_SECRET') as IEmail;
+
+        // Throw an error if the token is valid
+        
+        const error = new Error('User is not a guest.') as IError;
+        error.status = 401;
+        throw error;
+
+      }
 
     } catch (error: unknown) {
       return next();
