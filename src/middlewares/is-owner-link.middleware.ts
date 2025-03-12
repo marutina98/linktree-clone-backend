@@ -50,6 +50,15 @@ export default async function isOwnerLink(request: IRequestWithUser, response: R
     next();
 
   } catch (error: unknown) {
+  
+    const status = (error as IError).status || 500;
+    const message = (error as IError).message;
+
+    response.status(status).json({
+      message: `ERROR: ${message}`,
+      status: status
+    });
+
     console.error(error);
   }
 

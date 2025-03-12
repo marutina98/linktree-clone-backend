@@ -48,7 +48,15 @@ export default async function isAuthenticated(request: IRequestWithUser, respons
     }    
 
   } catch (error: unknown) {
-    request.user = undefined;
+
+    const status = (error as IError).status || 500;
+    const message = (error as IError).message;
+
+    response.status(status).json({
+      message: `ERROR: ${message}`,
+      status: status
+    });
+
     console.error(error);
   }
 
