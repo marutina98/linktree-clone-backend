@@ -170,13 +170,17 @@ export default class UserController {
     try {
 
       const id = parseInt(request.params.id);
-      const deleteUser = await prisma.user.delete({
+      
+      await prisma.user.delete({
         where: {
           id
         }
       });
 
-      response.status(200).json(deleteUser);
+      response.status(200).json({
+        message: `User with id ${id} was deleted`,
+        status: 200
+      });
 
     } catch (error) {
       console.error(error);
