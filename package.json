@@ -11,10 +11,11 @@
     "dev": "nodemon"
   },
   "dependencies": {
-    "@prisma/client": "^6.4.1",
+    "@prisma/client": "^6.5.0",
     "express": "^4.21.2"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.6.0",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.9",
@@ -23,7 +24,7 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.13.0",
     "nodemon": "^3.1.9",
-    "prisma": "^6.4.1",
+    "prisma": "^6.5.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
   }

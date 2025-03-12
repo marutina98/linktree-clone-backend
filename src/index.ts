@@ -6,6 +6,7 @@ const PORT = process.env.PORT;
 // Imports
 
 import errorHandlerMiddleware from './middlewares/error-handler.middleware';
+import { dataSeeder } from './seeders/data.seeder';
 
 // Import Routes
 
@@ -36,3 +37,9 @@ app.use('/api/authentication', authenticationRoutes);
 // Start Server
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}.`));
+
+// Seeding Database
+
+// (async () => {
+//   await dataSeeder.init();
+// })();
