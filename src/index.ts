@@ -18,6 +18,7 @@ import authenticationRoutes from './routes/authentication.routes';
 
 import express from 'express';
 const app = express();
+import cors from 'cors';
 
 // Express Middlewares: Body Parsing
 
@@ -26,6 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Express Middlewares: Other
 
+app.use(cors());
 app.use(errorHandlerMiddleware);
 
 // Express Routes
