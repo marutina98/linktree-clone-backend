@@ -1,0 +1,3 @@
+interface IToken {
+  email: string,
+}

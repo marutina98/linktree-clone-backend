@@ -11,6 +11,8 @@ import { bcryptService } from '../services/bcrypt.service';
 
 import IError from '../interfaces/error.interface';
 
+import { verify } from 'jsonwebtoken';
+
 // Controller
 
 export default class UserController {
@@ -83,11 +85,61 @@ export default class UserController {
 
   }
 
-  async getUserByEmail(request: Request, response: Response, next: Function): Promise<void> {
+  async getAuthenticatedUser(request: Request, response: Response, next: Function): Promise<void> {
 
     try {
 
-      const email = request.params.email;
+      const tokenHeader = request.headers.authorization;
+      
+      if (!tokenHeader) {
+        const error = new Error('User is not authenticated.') as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      const token = verify(tokenHeader as string, 'JWT_SECRET') as IToken;
+      const email = token.email;
+
+      if (!email) {
+        const error = new Error('Token could not be decoded.') as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      const user = await prisma.user.findUnique({
+
+        where: {
+          email
+        },
+
+        include: {
+          profile: true,
+          links: true
+        },
+
+        omit: {
+          password: true,
+        }
+
+      });
+
+      if (!user) {
+        const error = new Error('Authenticated User was not found.') as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      response.status(200).json(user);
+
+    } catch (error) {
+      console.error(error);
+    }
+
+    /*
+
+    try {
+
+      const email = request.body.email;
 
       const user = await prisma.user.findUnique({
 
@@ -117,6 +169,8 @@ export default class UserController {
     } catch (error) {
       console.error(error);
     }
+
+    */
 
   }
 
