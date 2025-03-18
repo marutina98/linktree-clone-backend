@@ -98,16 +98,24 @@ export default class UserController {
         next(error);
       }
 
-      const token = verify(tokenHeader as string, 'JWT_SECRET') as IToken;
-      const email = token.email;
-
-      if (!email) {
+      const token = tokenHeader?.split(' ')[1] as string;
+      const decodedToken = verify(token, 'JWT_SECRET') as IToken;
+      
+      if (!decodedToken) {
         const error = new Error('Token could not be decoded.') as IError;
         error.status = 500;
         next(error);
       }
 
-      const user = await prisma.user.findUnique({
+      const email = decodedToken.email;
+
+      if (!email) {
+        const error = new Error('Email could not be found in token.') as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      const user = await prisma.user.findUniqueOrThrow({
 
         where: {
           email
@@ -124,54 +132,11 @@ export default class UserController {
 
       });
 
-      if (!user) {
-        const error = new Error('Authenticated User was not found.') as IError;
-        error.status = 500;
-        next(error);
-      }
-
       response.status(200).json(user);
 
     } catch (error) {
       console.error(error);
     }
-
-    /*
-
-    try {
-
-      const email = request.body.email;
-
-      const user = await prisma.user.findUnique({
-
-        where: {
-          email
-        },
-
-        include: {
-          profile: true,
-          links: true
-        },
-
-        omit: {
-          password: true,
-        }
-
-      });
-
-      if (!user) {
-        const error = new Error(`User with email ${email} was not found.`) as IError;
-        error.status = 500;
-        next(error);
-      }
-
-      response.status(200).json(user);
-
-    } catch (error) {
-      console.error(error);
-    }
-
-    */
 
   }
 
