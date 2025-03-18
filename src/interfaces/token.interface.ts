@@ -1,3 +1,3 @@
-interface IToken {
+export default interface IToken {
   email: string,
 }

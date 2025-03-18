@@ -10,6 +10,7 @@ import { bcryptService } from '../services/bcrypt.service';
 // Interfaces
 
 import IError from '../interfaces/error.interface';
+import IToken from '../interfaces/token.interface';
 
 import { verify } from 'jsonwebtoken';
 
