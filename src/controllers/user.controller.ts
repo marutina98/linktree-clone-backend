@@ -83,6 +83,43 @@ export default class UserController {
 
   }
 
+  async getUserByEmail(request: Request, response: Response, next: Function): Promise<void> {
+
+    try {
+
+      const email = request.params.email;
+
+      const user = await prisma.user.findUnique({
+
+        where: {
+          email
+        },
+
+        include: {
+          profile: true,
+          links: true
+        },
+
+        omit: {
+          password: true,
+        }
+
+      });
+
+      if (!user) {
+        const error = new Error(`User with email ${email} was not found.`) as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      response.status(200).json(user);
+
+    } catch (error) {
+      console.error(error);
+    }
+
+  }
+
   async updateUser(request: Request, response: Response, next: Function): Promise<void> {
 
     try {
