@@ -145,7 +145,30 @@ export default class UserController {
 
     try {
 
-      const id = parseInt(request.params.id);
+      const tokenHeader = request.headers.authorization;
+      
+      if (!tokenHeader) {
+        const error = new Error('User is not authenticated.') as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      const token = tokenHeader?.split(' ')[1] as string;
+      const decodedToken = verify(token, 'JWT_SECRET') as IToken;
+      
+      if (!decodedToken) {
+        const error = new Error('Token could not be decoded.') as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      const email = decodedToken.email;
+
+      if (!email) {
+        const error = new Error('Email could not be found in token.') as IError;
+        error.status = 500;
+        next(error);
+      }
 
       const userDataArr: [string, string|object][] = [];
       const profileDataArr: [string, string][] = [];
@@ -193,7 +216,7 @@ export default class UserController {
       const user = await prisma.user.update({
 
         where: {
-          id
+          email
         },
 
         data: userDataObject,
@@ -215,10 +238,10 @@ export default class UserController {
         next(error);
       }
 
-      const token = this.generateJsonWebToken(user);
+      const newToken = this.generateJsonWebToken(user);
       const userWithToken = {
         ...user,
-        token
+        newToken
       }
 
       response.status(202).json(userWithToken);
@@ -233,16 +256,39 @@ export default class UserController {
 
     try {
 
-      const id = parseInt(request.params.id);
+      const tokenHeader = request.headers.authorization;
+      
+      if (!tokenHeader) {
+        const error = new Error('User is not authenticated.') as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      const token = tokenHeader?.split(' ')[1] as string;
+      const decodedToken = verify(token, 'JWT_SECRET') as IToken;
+      
+      if (!decodedToken) {
+        const error = new Error('Token could not be decoded.') as IError;
+        error.status = 500;
+        next(error);
+      }
+
+      const email = decodedToken.email;
+
+      if (!email) {
+        const error = new Error('Email could not be found in token.') as IError;
+        error.status = 500;
+        next(error);
+      }
       
       await prisma.user.delete({
         where: {
-          id
+          email
         }
       });
 
       response.status(200).json({
-        message: `User with id ${id} was deleted`,
+        message: 'Authenticated User cannot be deleted.',
         status: 200
       });
 
