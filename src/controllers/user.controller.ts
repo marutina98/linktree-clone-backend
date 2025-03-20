@@ -7,12 +7,13 @@ import { prisma } from '../services/prisma.service';
 
 import { bcryptService } from '../services/bcrypt.service';
 
-// Interfaces
+// Interfaces and Types
 
 import IError from '../interfaces/error.interface';
 import IToken from '../interfaces/token.interface';
+import { User } from '@prisma/client';
 
-import { verify } from 'jsonwebtoken';
+import { verify, sign } from 'jsonwebtoken';
 
 // Controller
 
@@ -214,7 +215,13 @@ export default class UserController {
         next(error);
       }
 
-      response.status(202).json(user);
+      const token = this.generateJsonWebToken(user);
+      const userWithToken = {
+        ...user,
+        token
+      }
+
+      response.status(202).json(userWithToken);
 
     } catch (error) {
       console.error(error);
@@ -243,6 +250,15 @@ export default class UserController {
       console.error(error);
     }
 
+  }
+
+  // Generate JsonWebToken for newly registered/logged in user.
+  // I omit password because it's not needed.
+
+  generateJsonWebToken(user: Omit<User, 'password'>) {
+    return sign({
+      email: user.email
+    }, 'JWT_SECRET');
   }
 
 }
