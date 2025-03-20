@@ -24,17 +24,17 @@ import cors from 'cors';
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Express Middlewares: Other
-
 app.use(cors());
-app.use(errorHandlerMiddleware);
 
 // Express Routes
 
 app.use('/api/users', userRoutes);
 app.use('/api/links', linkRoutes);
 app.use('/api/authentication', authenticationRoutes);
+
+// Express Middlewares: Other
+
+app.use(errorHandlerMiddleware);
 
 // Start Server
 

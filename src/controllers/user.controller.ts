@@ -39,7 +39,7 @@ export default class UserController {
       if (!users) {
         const error = new Error(`No Users were found.`) as IError;
         error.status = 500;
-        next(error);
+        return next(error);
       }
 
       response.status(200).json(users);
@@ -76,7 +76,7 @@ export default class UserController {
       if (!user) {
         const error = new Error(`User with id ${id} was not found.`) as IError;
         error.status = 500;
-        next(error);
+        return next(error);
       }
 
       response.status(200).json(user);
@@ -96,7 +96,7 @@ export default class UserController {
       if (!tokenHeader) {
         const error = new Error('User is not authenticated.') as IError;
         error.status = 500;
-        next(error);
+        return next(error);
       }
 
       const token = tokenHeader?.split(' ')[1] as string;
@@ -105,7 +105,7 @@ export default class UserController {
       if (!decodedToken) {
         const error = new Error('Token could not be decoded.') as IError;
         error.status = 500;
-        next(error);
+        return next(error);
       }
 
       const email = decodedToken.email;
@@ -113,7 +113,7 @@ export default class UserController {
       if (!email) {
         const error = new Error('Email could not be found in token.') as IError;
         error.status = 500;
-        next(error);
+        return next(error);
       }
 
       const user = await prisma.user.findUniqueOrThrow({
@@ -150,7 +150,7 @@ export default class UserController {
       if (!tokenHeader) {
         const error = new Error('User is not authenticated.') as IError;
         error.status = 500;
-        next(error);
+        return next(error);
       }
 
       const token = tokenHeader?.split(' ')[1] as string;
@@ -159,7 +159,7 @@ export default class UserController {
       if (!decodedToken) {
         const error = new Error('Token could not be decoded.') as IError;
         error.status = 500;
-        next(error);
+        return next(error);
       }
 
       const email = decodedToken.email;
@@ -167,7 +167,7 @@ export default class UserController {
       if (!email) {
         const error = new Error('Email could not be found in token.') as IError;
         error.status = 500;
-        next(error);
+        return next(error);
       }
 
       const userDataArr: [string, string|object][] = [];
@@ -235,13 +235,14 @@ export default class UserController {
       if (!user) {
         const error = new Error(`User could not be update.`) as IError;
         error.status = 409;
-        next(error);
+        return next(error);
       }
 
       const newToken = this.generateJsonWebToken(user);
+
       const userWithToken = {
         ...user,
-        newToken
+        token: newToken
       }
 
       response.status(202).json(userWithToken);
@@ -261,7 +262,7 @@ export default class UserController {
       if (!tokenHeader) {
         const error = new Error('User is not authenticated.') as IError;
         error.status = 500;
-        next(error);
+        return next(error);
       }
 
       const token = tokenHeader?.split(' ')[1] as string;
@@ -270,7 +271,7 @@ export default class UserController {
       if (!decodedToken) {
         const error = new Error('Token could not be decoded.') as IError;
         error.status = 500;
-        next(error);
+        return next(error);
       }
 
       const email = decodedToken.email;
@@ -278,7 +279,7 @@ export default class UserController {
       if (!email) {
         const error = new Error('Email could not be found in token.') as IError;
         error.status = 500;
-        next(error);
+        return next(error);
       }
       
       await prisma.user.delete({

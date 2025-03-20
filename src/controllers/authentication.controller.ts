@@ -61,7 +61,7 @@ export default class AuthenticationController {
       if (!user) {
         const error = new Error(`User could not be created.`) as IError;
         error.status = 409;
-        next(error);
+        return next(error);
       }
 
       const token = this.generateJsonWebToken(user);
@@ -101,7 +101,7 @@ export default class AuthenticationController {
       if (!user) {
         const error = new Error(`User could not be found.`) as IError;
         error.status = 409;
-        next(error);
+        return next(error);
       }
 
       const hashedPassword = user!.password;
@@ -114,7 +114,7 @@ export default class AuthenticationController {
       if (!isPasswordCorrect) {
         const error = new Error('Password is not correct') as IError;
         error.status = 401;
-        next(error);
+        return next(error);
       }
 
       // Delete the password from the received User

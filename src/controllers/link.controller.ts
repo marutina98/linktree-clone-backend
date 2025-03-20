@@ -24,7 +24,7 @@ export default class LinkController {
       if (!links) {
         const error = new Error(`No links were found.`) as IError;
         error.status = 500;
-        next(error);
+        return next(error);
       }
 
       response.status(200).json(links);
@@ -50,7 +50,7 @@ export default class LinkController {
       if (!link) {
         const error = new Error(`The Link with id ${id} was not found.`) as IError;
         error.status = 500;
-        next(error);
+        return next(error);
       }
 
       response.status(200).json(link);
@@ -75,7 +75,7 @@ export default class LinkController {
       if (!link) {
         const error = new Error(`The Link could not be created.`) as IError;
         error.status = 500;
-        next(error);
+        return next(error);
       }
 
       response.status(200).json(link);
@@ -106,7 +106,7 @@ export default class LinkController {
       if (!link) {
         const error = new Error(`Link could not be updated.`) as IError;
         error.status = 409;
-        next(error);
+        return next(error);
       }
 
       response.status(202).json(link);
@@ -147,7 +147,7 @@ export default class LinkController {
       if (isNaN(id)) {
         const error = new Error('The received id is not a number.') as IError;
         error.status = 400;
-        next(error);
+        return next(error);
       }
 
       // Find Unique or Throw Error
@@ -166,7 +166,7 @@ export default class LinkController {
       if (currentOrder <= 1) {
         const error = new Error(`Link with ${id} id could not be moved down.`) as IError;
         error.status = 400;
-        next(error);
+        return next(error);
       }
 
       // Get userId from link
@@ -214,7 +214,7 @@ export default class LinkController {
       if (isNaN(id)) {
         const error = new Error('The received id is not a number.') as IError;
         error.status = 400;
-        next(error);
+        return next(error);
       }
 
       // Find Unique or Throw Error
@@ -241,7 +241,7 @@ export default class LinkController {
       if (currentOrder >= maxOrder) {
         const error = new Error(`Link with ${id} id could not be moved down.`) as IError;
         error.status = 400;
-        next(error);
+        return next(error);
       }
 
       // Find under link or throw error
