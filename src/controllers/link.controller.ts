@@ -8,8 +8,11 @@ interface ILinkUpdate {
 
 // Interfaces & Types
 
+import IToken from '../interfaces/token.interface';
 import IError from '../interfaces/error.interface';
 import ILinkUpdateRequest from '../interfaces/link-update-request.interface';
+
+import { verify } from 'jsonwebtoken';
 
 import { Link } from '@prisma/client';
 
@@ -65,12 +68,53 @@ export default class LinkController {
 
     try {
 
-      const id = parseInt(request.body.id);
+      // Get userId from authenticated user
 
-      const data = request.body as Link;
-      data.order = await this.getCorrectOrder(id);
+      const tokenHeader = request.headers.authorization;
+            
+      if (!tokenHeader) {
+        const error = new Error('User is not authenticated.') as IError;
+        error.status = 500;
+        return next(error);
+      }
 
-      const link = prisma.link.create({ data });
+      const token = tokenHeader?.split(' ')[1] as string;
+      const decodedToken = verify(token, 'JWT_SECRET') as IToken;
+      
+      if (!decodedToken) {
+        const error = new Error('Token could not be decoded.') as IError;
+        error.status = 500;
+        return next(error);
+      }
+
+      const email = decodedToken.email;
+
+      if (!email) {
+        const error = new Error('Email could not be found in token.') as IError;
+        error.status = 500;
+        return next(error);
+      }
+
+      const user = await prisma.user.findUniqueOrThrow({
+
+        where: {
+          email
+        },
+
+        omit: {
+          password: true,
+        }
+
+      });
+
+      const userId = user.id;
+
+      const data = request.body as Omit<Link, 'id'>;
+
+      data.userId = userId;
+      data.order = await this.getCorrectOrder(userId);
+
+      const link = await prisma.link.create({ data });
 
       if (!link) {
         const error = new Error(`The Link could not be created.`) as IError;
