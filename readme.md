@@ -1,4 +1,4 @@
-# [LinkTree Backend Clone]
+# LinkTree Backend Clone
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://example.com/build)
 
