@@ -45,3 +45,5 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}.`));
 // (async () => {
 //   await dataSeeder.init();
 // })();
+
+export default app;
