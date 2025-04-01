@@ -36,14 +36,14 @@ app.use('/api/authentication', authenticationRoutes);
 
 app.use(errorHandlerMiddleware);
 
+// Seeding Database
+
+// (async () => {
+//   await dataSeeder.init();
+// })();
+
 // Start Server
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}.`));
-
-// Seeding Database
-
-(async () => {
-  await dataSeeder.init();
-})();
 
 export default app;
