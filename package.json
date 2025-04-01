@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon",
-    "postinstall": "prisma generate && prisma migrate dev && prisma migrate deploy",
+    "postinstall": "prisma generate",
     "build": "prisma generate && tsc"
   },
   "dependencies": {
