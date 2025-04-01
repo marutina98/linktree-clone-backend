@@ -13,9 +13,8 @@ import IError from '../interfaces/error.interface';
 import ILinkUpdateRequest from '../interfaces/link-update-request.interface';
 
 import { verify } from 'jsonwebtoken';
-import { Prisma } from '@prisma/client';
 
-type Link = Prisma.UserGetPayload<{}>;
+import { Link } from '@prisma/client';
 
 export default class LinkController {
 
