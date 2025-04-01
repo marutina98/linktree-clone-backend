@@ -11,8 +11,13 @@ import { bcryptService } from '../services/bcrypt.service';
 import IError from '../interfaces/error.interface';
 import IUserCreateRequest from '../interfaces/user-create-request.interface';
 
-import { User } from '@prisma/client';
+// import { User } from '@prisma/client';
+
+import { Prisma } from '@prisma/client';
+
 import IOptionalPassword from '../interfaces/optional-password.interface';
+
+type User = Prisma.UserGetPayload<{}>;
 
 export default class AuthenticationController {
 
